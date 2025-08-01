@@ -1,0 +1,23 @@
+services:
+  auth:
+    build: ./auth-services
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./auth.db
+    volumes:
+      - ./auth-service:/app
+
+  menu:
+    build: ./menu-service
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./menu-service:/app
+
+  order:
+    build: ./order-service
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./order-service:/app
