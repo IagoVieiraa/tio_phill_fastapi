@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .models import Base
+from app.models.user_model import Base
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./auth.db")
