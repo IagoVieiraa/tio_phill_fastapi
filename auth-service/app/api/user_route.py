@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from app.services import user_service
-from app.schemas.user_schema import UserCreate
+from ..services import user_service
+from ..schemas.user_schema import UserCreate
 
 router = APIRouter()
 

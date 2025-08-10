@@ -1,4 +1,4 @@
-from app.core.db import SessionLocal
+from ..core.db import SessionLocal
 
 def create_user(new_user):
     db = SessionLocal()

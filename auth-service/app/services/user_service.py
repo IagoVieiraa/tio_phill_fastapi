@@ -1,6 +1,6 @@
-from app.utils.hash_password import hash_password
-from app.models.user_model import User
-from app.repositories import user_repository
+from ..utils.hash_password import hash_password
+from ..models.user_model import User
+from ..repositories import user_repository
 
 def service_create_user(**user_credentials):
     try:
@@ -27,7 +27,7 @@ def service_create_user(**user_credentials):
 
         created_user = user_repository.create_user(new_user)
 
-        return {"success": True, "body": f"User with id {created_user}   created successfuly", "status_code": 201, "id": str(created_user.id)}
+        return {"success": True, "body": f"User {created_user.email}  created successfuly", "status_code": 201, "id": str(created_user.id)}
     except Exception as ex:
         print(ex)
         return {"success": False, "body": "Error occurred in create_user","status_code": 500}
