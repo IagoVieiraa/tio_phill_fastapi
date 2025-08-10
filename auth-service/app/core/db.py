@@ -3,7 +3,10 @@ from sqlalchemy.orm import sessionmaker
 from ..models.user_model import Base
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./auth.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE_PATH = os.path.join(BASE_DIR, "auth.db")
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

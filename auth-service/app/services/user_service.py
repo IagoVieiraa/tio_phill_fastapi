@@ -17,10 +17,13 @@ def service_create_user(**user_credentials):
         email = user_credentials.get("email")
         pw = user_credentials.get("password")
 
+        if user_repository.get_user_by_email(email):
+            return {"success": False, "body": "Email already exists. Please, log-in with your email"}
+
         if email is None or not isinstance(email, str):
-            return {"success": False, "body": "Email format is invalid.", "status_code": 401}
+            return {"success": False, "body": "Email format is invalid.", "status_code": 400}
         if pw is None or not isinstance(pw, str):
-            return {"success": False, "body": "Password format is invalid", "status_code": 402}
+            return {"success": False, "body": "Password format is invalid", "status_code": 400}
         
         hashed_pw = hash_password(pw)
         new_user = User(email=user_credentials.get("email"), hashed_password=hashed_pw)
