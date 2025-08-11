@@ -1,8 +1,13 @@
 from ..utils.hash_password import hash_password
 from ..models.user_model import User
 from ..repositories import user_repository
+from datetime import timedelta
+from passlib.context import CryptContext
+from ..utils.handle_jwt import create_access_token
 
-def service_create_user(**user_credentials):
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def create_user(**user_credentials):
     try:
         """
             Creates a User object. Validates the data received from the route and calls the Repository class to create the obj in the DB
@@ -18,7 +23,7 @@ def service_create_user(**user_credentials):
         pw = user_credentials.get("password")
 
         if user_repository.get_user_by_email(email):
-            return {"success": False, "body": "Email already exists. Please, log-in with your email"}
+            return {"success": False, "body": "Email already exists. Please, log-in with your email", "status_code": 400}
 
         if email is None or not isinstance(email, str):
             return {"success": False, "body": "Email format is invalid.", "status_code": 400}
@@ -34,3 +39,21 @@ def service_create_user(**user_credentials):
     except Exception as ex:
         print(ex)
         return {"success": False, "body": "Error occurred in create_user","status_code": 500}
+    
+def login(**user_credentials):
+    user = authenticate_user(user_credentials)
+    if not user:
+        return None
+    token_expires = timedelta(minutes=30)
+    token = create_access_token({"sub": user.email}, token_expires)
+    return token
+
+def authenticate_user(user_credentials: dict):
+    user = user_repository.get_user_by_email(user_credentials["email"])
+    if user and verify_password(user_credentials["password"], user.hashed_password):
+        return user
+    else:
+        return None
+
+def verify_password(received_password, hashed_password):
+    return pwd_context.verify(received_password, hashed_password)

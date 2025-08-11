@@ -1,4 +1,6 @@
-from hashlib import sha256
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
-    return sha256(password.encode()).hexdigest()
+    return pwd_context.hash(password)
