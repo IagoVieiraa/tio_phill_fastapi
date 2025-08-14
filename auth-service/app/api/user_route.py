@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Header
 from fastapi.responses import JSONResponse
 from ..services import user_service
 from ..schemas.auth_schema import Login, Token
@@ -20,3 +20,14 @@ def login_endpoint(credentials: dict):
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciais inválidas")
     return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/users/check-token")
+def get_user_authenticate(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token is missing or it's invalid"
+        )
+
+    token = authorization.split(" ")[1]
+    return user_service.check_token(token)

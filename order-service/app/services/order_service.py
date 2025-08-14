@@ -1,22 +1,28 @@
+from fastapi import HTTPException, status
 from ..models.order_model import Order
 from ..repositories import order_repository
 from datetime import  datetime
+import httpx
 
-def create_order(**order_data):
+
+AUTH_SERVICE_URL = "http://localhost:8002"
+
+def create_order(order_data: dict, token_user: str = None):
     try:
-        user_name = order_data.get("user_name", None)
         value = order_data.get("value", 0.0)
         order_date = datetime.now().date()
         start_at = datetime.now()
         
-        if user_name == None:
+        if token_user is not None:
+            user_id = validate_user_token(token_user)
+        if user_id == None:
             print("Usuário não registrado")
             ...
         if value == 0.0:
             print("O pedido não pode ser criado com valor = 0")
             return {"success": False, "body": "The order can't be created with value equals zero", "status_code": 400}
         
-        new_order = Order(user_name=user_name, value=value, date=order_date, start_at=start_at)
+        new_order = Order(user_id=user_id, value=value, date=order_date, start_at=start_at)
 
         created_order = order_repository.create_order(new_order)
 
@@ -25,3 +31,18 @@ def create_order(**order_data):
         print(ex)
         return {"success": False, "body": "Error ocurred in create_order", "status_code": 500}
 
+
+def validate_user_token(token: str) -> int:
+    try:
+        response = httpx.get(
+            f"{AUTH_SERVICE_URL}/users/check-token",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuário não autenticado"
+            )
+        return response.json().get("body", {}).get("id")
+    except  Exception as ex:
+        return None

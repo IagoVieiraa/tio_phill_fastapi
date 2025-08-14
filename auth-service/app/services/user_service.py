@@ -4,6 +4,10 @@ from ..repositories import user_repository
 from datetime import timedelta
 from passlib.context import CryptContext
 from ..utils.handle_jwt import create_access_token
+from jose import jwt, JWTError
+from fastapi import HTTPException, status
+from datetime import datetime
+from ..core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -57,3 +61,30 @@ def authenticate_user(user_credentials: dict):
 
 def verify_password(received_password, hashed_password):
     return pwd_context.verify(received_password, hashed_password)
+
+def check_token(token: str):
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+
+        # Checa expiração
+        exp = payload.get("exp")
+        if exp and datetime.utcnow().timestamp() > exp:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token expirado"
+            )
+
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token inválido"
+            )
+
+        return {"success": True, "body": f"{user_id} Está logado.", "status_code": 200}
+
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido"
+        )
