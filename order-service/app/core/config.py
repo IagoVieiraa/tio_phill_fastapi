@@ -3,7 +3,8 @@ from typing import ClassVar
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Carrega variáveis do .env
+
 class Settings(BaseSettings):
     SECRET_KEY: str = "sua_chave_super_segura"
     ALGORITHM: str = "HS256"

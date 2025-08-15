@@ -3,12 +3,13 @@ from sqlalchemy.orm import sessionmaker
 from ..models.user_model import Base
 import os
 from pathlib import Path
+from .config import settings  # importa do config
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_PATH = os.path.join(BASE_DIR, "auth.db")
-DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+DATABASE_URL = settings.DATABASE_URL
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, connect_args={})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
