@@ -41,6 +41,6 @@ def validate_user_token(token: str) -> int:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Usuário não autenticado"
             )
-        return response.json().get("body", {}).get("id")
+        return response.json().get("body", {}).get("user_id")
     except  Exception as ex:
         return None

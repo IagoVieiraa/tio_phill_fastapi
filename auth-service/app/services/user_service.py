@@ -1,7 +1,7 @@
 from ..utils.hash_password import hash_password
 from ..models.user_model import User
 from ..repositories import user_repository
-from datetime import timedelta
+from datetime import timedelta, timezone
 from passlib.context import CryptContext
 from ..utils.handle_jwt import create_access_token
 from jose import jwt, JWTError
@@ -68,20 +68,22 @@ def check_token(token: str):
 
         # Checa expiração
         exp = payload.get("exp")
-        if exp and datetime.utcnow().timestamp() > exp:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token expirado"
-            )
+        if exp:
+            exp_datetime = datetime.fromtimestamp(exp, tz=timezone.utc)
+            if datetime.now(timezone.utc) > exp_datetime:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token expirado"
+                )
 
-        user_id = payload.get("sub")
-        if not user_id:
+        user = user_repository.get_user_by_email(payload.get("sub"))
+        if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token inválido"
             )
 
-        return {"success": True, "body": f"{user_id} Está logado.", "status_code": 200}
+        return {"success": True, "body": {"user_id": user.id, "user_email": user.email}, "status_code": 200}
 
     except JWTError:
         raise HTTPException(

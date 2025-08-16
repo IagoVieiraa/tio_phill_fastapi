@@ -30,4 +30,9 @@ def get_user_authenticate(authorization: str = Header(None)):
         )
 
     token = authorization.split(" ")[1]
-    return user_service.check_token(token)
+    result = user_service.check_token(token)
+    
+    return JSONResponse(
+        content=result,
+        status_code=result["status_code"]
+    )
