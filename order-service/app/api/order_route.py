@@ -7,14 +7,9 @@ router = APIRouter()
 
 @router.post("/create")
 def create_order(order_data: dict, authorization: str = Header(None)):
-    # if authorization and authorization.startswith("Bearer "):
-    token = order_data.get("user_token")
-    result = order_service.create_order(order_data, token)
-        # Aqui você pode associar o pedido ao user_info["user_id"]
-    # else:
-    #     user_info = None  # Pedido anônimo
+    # token = order_data.get("user_token")
+    result = order_service.create_order(order_data, authorization)
 
-    # Criação do pedido (com ou sem usuário vinculado)
     return JSONResponse(
         content=result,
         status_code=result["status_code"]

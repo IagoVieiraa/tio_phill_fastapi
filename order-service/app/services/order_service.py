@@ -33,7 +33,7 @@ def validate_user_token(token: str) -> int:
     try:
         response = httpx.get(
             f"{AUTH_SERVICE_URL}/auth/users/check-token",
-            headers={"Authorization": f"Bearer {token}"}
+            headers={"Authorization": token}
         )
         if response.status_code != 200:
             raise HTTPException(
