@@ -1,5 +1,7 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
+from typing import Annotated
 
-class UserCreate(BaseModel):
+class User(BaseModel):
     email: str
     password: str
+    role: Annotated[str, constr(to_upper=True)]

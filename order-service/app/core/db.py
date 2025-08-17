@@ -1,14 +1,10 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from ..models.order_model import Base
-import os
-from pathlib import Path
+from sqlalchemy.orm import sessionmaker, declarative_base
 from .config import settings
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASE_URL = settings.DATABASE_URL
 
-engine = create_engine(DATABASE_URL, connect_args={})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_engine(DATABASE_URL)  # ou connect_args={"check_same_thread": False} para SQLite
 
-Base.metadata.create_all(bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()

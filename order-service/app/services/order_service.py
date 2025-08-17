@@ -13,18 +13,17 @@ def create_order(order_data: dict, token_user: str = None):
         status = order_data.get("status")
         order_date = datetime.now().date()
         start_at = datetime.now()
-        user_id = None
 
         if token_user is not None:
-            user_id = validate_user_token(token_user)
-        if user_id == None:
-            print("Usuário não registrado")
-            ...
-        new_order = Order(user_id=user_id, total_value=value, status=status, date=order_date, start_at=start_at)
+            user_data = validate_user_token(token_user)
+
+        new_order = Order(user_id=user_data.get("user_id"), total_value=value, status=status, date=order_date, start_at=start_at)
 
         created_order = order_repository.create_order(new_order)
-
-        return {"success": True, "body": f"Order with id {created_order.id} registered!", "status_code": 201}
+        if created_order.user_id is None:
+            return {"success": True, "body": f"Order with id {created_order.id} registered!", "status_code": 201}
+        else:
+            return {"success": True, "body": f"User with email {user_data.get("user_email")} registered a order with id {created_order.id}", "status_code": 201}
     except Exception as ex:
         print(ex)
         return {"success": False, "body": "Error ocurred in create_order", "status_code": 500}
@@ -41,6 +40,7 @@ def validate_user_token(token: str) -> int:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Usuário não autenticado"
             )
-        return response.json().get("body", {}).get("user_id")
+        user_data = response.json().get("body")
+        return user_data
     except  Exception as ex:
         return None
