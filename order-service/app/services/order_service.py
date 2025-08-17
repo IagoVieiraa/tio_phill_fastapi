@@ -13,11 +13,13 @@ def create_order(order_data: dict, token_user: str = None):
         status = order_data.get("status")
         order_date = datetime.now().date()
         start_at = datetime.now()
+        user_id = None
 
         if token_user is not None:
             user_data = validate_user_token(token_user)
-
-        new_order = Order(user_id=user_data.get("user_id"), total_value=value, status=status, date=order_date, start_at=start_at)
+            user_id = user_data.get("user_id")
+        
+        new_order = Order(user_id=user_id, total_value=value, status=status, date=order_date, start_at=start_at)
 
         created_order = order_repository.create_order(new_order)
         if created_order.user_id is None:
@@ -29,7 +31,7 @@ def create_order(order_data: dict, token_user: str = None):
         return {"success": False, "body": "Error ocurred in create_order", "status_code": 500}
 
 
-def validate_user_token(token: str) -> int:
+def validate_user_token(token: str) -> dict:
     try:
         response = httpx.get(
             f"{AUTH_SERVICE_URL}/auth/users/check-token",
