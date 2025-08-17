@@ -23,8 +23,7 @@ def login_endpoint(credentials: Login):
 
 @router.get("/users/check-token")
 def get_user_authenticate(authorization: str = Header(...)):
-    result = user_service.check_token(authorization)
-    
+    result = user_service.check_token(authorization)    
     return JSONResponse(
         content=result,
         status_code=result["status_code"]

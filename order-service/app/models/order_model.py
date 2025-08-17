@@ -1,9 +1,5 @@
 from sqlalchemy import Column, String, Date, DateTime, Float, Integer
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import declarative_base
-from uuid import uuid4
-
-Base = declarative_base()
+from app.core.db import Base
 
 class Order(Base):
     __tablename__ = "orders"

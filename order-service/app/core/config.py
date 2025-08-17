@@ -3,7 +3,7 @@ from typing import ClassVar
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Carrega variáveis do .env
+load_dotenv()
 
 class Settings(BaseSettings):
     SECRET_KEY: str = "sua_chave_super_segura"

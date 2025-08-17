@@ -7,7 +7,6 @@ router = APIRouter()
 
 @router.post("/create")
 def create_order(order_data: dict, authorization: str = Header(None)):
-    # token = order_data.get("user_token")
     result = order_service.create_order(order_data, authorization)
 
     return JSONResponse(
