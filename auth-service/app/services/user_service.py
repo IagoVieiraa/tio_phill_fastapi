@@ -11,6 +11,9 @@ from fastapi import HTTPException, status
 from datetime import datetime
 from ..core.config import settings
 
+from ..types.response import Response
+
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_user(user_credentials: UserSchema) -> dict:
@@ -34,16 +37,18 @@ def create_user(user_credentials: UserSchema) -> dict:
             return {"success": False, "body": "Email already exists. Please, log-in with your email", "status_code": 400}
 
         if email is None or not isinstance(email, str) or "@" not in email:
-            return {"success": False, "body": "Email format is invalid.", "status_code": 400}
+            return Response(False, "Email format is invalid.", 400)
         if pw is None or not isinstance(pw, str) or len(pw) < 6:
-            return {"success": False, "body": "Password format is invalid", "status_code": 400}
+            Response(False, "Password's length needs to be higher them 6", 400)
+        if not any(d.isdigit() for d in pw):
+            Response(False, "Password needs to have at least one number", 400)
         
         hashed_pw = hash_password(pw)
         new_user = User(email=user_credentials.email, hashed_password=hashed_pw, role=role)
 
         created_user = user_repository.create_user(new_user)
-
-        return {"success": True, "body": f"User with role {created_user.role} and {created_user.email}  created successfuly", "status_code": 201, "id": str(created_user.id)}
+        return Response(True, f"User with role {created_user.role} and {created_user.email} created successfuly" , 201)
+        # return {"success": True, "body":  , "status_code": 201, "id": str(created_user.id)}
     except Exception as ex:
         print(ex)
         return {"success": False, "body": "Error occurred in create_user","status_code": 500}

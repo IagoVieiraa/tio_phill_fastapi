@@ -3,15 +3,15 @@ from fastapi.responses import JSONResponse
 from ..services import user_service
 from ..schemas.auth_schema import Login, Token
 from ..schemas.user_schema import User
-
+from ..types.response import Response
 router = APIRouter()
 
 @router.post("/users/create")
 def register_user(user_credentials: User):
-    result = user_service.create_user(user_credentials)
+    result: Response = user_service.create_user(user_credentials)
     return JSONResponse(
-        content=result,
-        status_code=result["status_code"]
+        content=result.__dict__,
+        status_code=result.status_code
     )
 
 @router.post("/users/login", response_model=Token)
