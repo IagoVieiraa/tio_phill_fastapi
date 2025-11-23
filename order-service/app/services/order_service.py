@@ -15,8 +15,8 @@ def create_order(order_data: OrderCreateSchema, token_user: str = None):
     try:
         total_price = 0
         status = "pending"
-        order_date = datetime.now().date()
         start_at = datetime.now()
+        order_date = start_at.date()
         user_id = None
         order_items = []
 
@@ -31,12 +31,14 @@ def create_order(order_data: OrderCreateSchema, token_user: str = None):
         for item in items:
             order_item = OrderItem()
             order_item.order_id = created_order.id
-            order_item.product_id = item.product_id
+            order_item.menu_item_id = item.menu_item_id
             order_item.quantity = item.quantity
             order_item.unit_price = item.unit_price
-            order_item.total_price += item.unit_price * item.quantity
-            created_order_item = order_repository.create_order_item(order_item)
+            created_order_item = order_repository.create_order_item(order_item, created_order.id)
+            created_order.total_value += item.unit_price * item.quantity
             order_items.append(created_order_item)
+        
+        order_repository.update_order(created_order)
         
         if len(order_items) > 0:
             down_items_from_stock(order_items)

@@ -1,6 +1,7 @@
 services:
   auth:
-    build: ./auth-services
+    build: 
+      context: ./auth-service
     ports:
       - "8001:8000"
     environment:
@@ -9,15 +10,17 @@ services:
       - ./auth-service:/app
 
   menu:
-    build: ./menu-service
+    build: 
+      context: ./menu-service
     ports:
       - "8002:8000"
     volumes:
       - ./menu-service:/app
 
   order:
-    build: ./order-service
+    build: 
+      context: ./order-service
     ports:
-      - "8001:8000"
+      - "8003:8000"
     volumes:
       - ./order-service:/app

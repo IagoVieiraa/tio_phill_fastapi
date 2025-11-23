@@ -1,14 +1,23 @@
-from fastapi import APIRouter, HTTPException, Header, status
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from ..services import order_service
-from ..schemas.order_schema import OrderCreate, OrderResponse
+from sqlalchemy.orm import Session
+from ..services import product_service
+from ..schemas.product_schema import ProductCreate
+from ..core.db import get_db
 
 router = APIRouter()
 
-@router.post("/create", response_model=OrderResponse)
-def create_order(order_data: OrderCreate, authorization: str = Header(None)):
-    result = order_service.create_order(order_data, authorization)
+@router.post("/products/create")
+def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
+    result = product_service.create_product(db, product_data)
+    return JSONResponse(
+        content=result,
+        status_code=result["status_code"]
+    )
 
+@router.get("/products")
+def get_all_products_endpoint(db: Session = Depends(get_db)):
+    result = product_service.get_all_products(db)
     return JSONResponse(
         content=result,
         status_code=result["status_code"]

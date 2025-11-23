@@ -4,7 +4,7 @@ from typing import List
 
 # schema de cada item do pedido
 class OrderItemCreate(BaseModel):
-    product_id: int
+    menu_item_id: int
     product_name: str
     quantity: int
     unit_price: float
